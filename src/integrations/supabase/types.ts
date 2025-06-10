@@ -41,6 +41,7 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          lightswitch_user_id: string | null
           name: string
           updated_at: string
         }
@@ -48,6 +49,7 @@ export type Database = {
           created_at?: string
           email: string
           id?: string
+          lightswitch_user_id?: string | null
           name: string
           updated_at?: string
         }
@@ -55,6 +57,7 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          lightswitch_user_id?: string | null
           name?: string
           updated_at?: string
         }

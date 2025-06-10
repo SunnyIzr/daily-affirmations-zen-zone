@@ -20,8 +20,17 @@ const Index = () => {
     );
   }
 
-  // Get today's affirmation (using a simple method for now)
-  const todayAffirmation = affirmations?.[new Date().getDate() % (affirmations?.length || 1)];
+  // Get random free and premium affirmations
+  const freeAffirmations = affirmations?.filter(a => !a.premium) || [];
+  const premiumAffirmations = affirmations?.filter(a => a.premium) || [];
+  
+  const randomFreeAffirmation = freeAffirmations.length > 0 
+    ? freeAffirmations[Math.floor(Math.random() * freeAffirmations.length)]
+    : null;
+    
+  const randomPremiumAffirmation = premiumAffirmations.length > 0 
+    ? premiumAffirmations[Math.floor(Math.random() * premiumAffirmations.length)]
+    : null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100">
@@ -40,20 +49,35 @@ const Index = () => {
           </p>
         </div>
 
-        {/* Today's Affirmation */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-semibold text-center mb-8 text-gray-700">
-            Today's Affirmation
-          </h2>
-          {isLoading ? (
-            <div className="max-w-2xl mx-auto">
+        {/* Daily Affirmations Side by Side */}
+        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto mb-16">
+          {/* Free Affirmation */}
+          <div>
+            <h2 className="text-2xl font-semibold text-center mb-6 text-gray-700">
+              Free Affirmation
+            </h2>
+            {isLoading ? (
               <Skeleton className="h-48 w-full rounded-lg" />
-            </div>
-          ) : todayAffirmation ? (
-            <AffirmationCard affirmation={todayAffirmation} />
-          ) : (
-            <div className="text-center text-gray-500">No affirmation available</div>
-          )}
+            ) : randomFreeAffirmation ? (
+              <AffirmationCard affirmation={randomFreeAffirmation} />
+            ) : (
+              <div className="text-center text-gray-500">No free affirmation available</div>
+            )}
+          </div>
+
+          {/* Premium Affirmation */}
+          <div>
+            <h2 className="text-2xl font-semibold text-center mb-6 text-gray-700">
+              Premium Affirmation
+            </h2>
+            {isLoading ? (
+              <Skeleton className="h-48 w-full rounded-lg" />
+            ) : randomPremiumAffirmation ? (
+              <AffirmationCard affirmation={randomPremiumAffirmation} />
+            ) : (
+              <div className="text-center text-gray-500">No premium affirmation available</div>
+            )}
+          </div>
         </div>
 
         {/* All Affirmations */}

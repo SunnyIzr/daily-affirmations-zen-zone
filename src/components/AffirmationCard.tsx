@@ -3,11 +3,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Heart, DollarSign, Zap, Users, RotateCcw } from "lucide-react";
-import { Affirmation } from "@/hooks/useAffirmations";
+import { useAffirmationById, Affirmation } from "@/hooks/useAffirmations";
 import { useState } from "react";
 
 interface AffirmationCardProps {
-  affirmation: Affirmation;
+  affirmationTopic: Pick<Affirmation, 'id' | 'topic' | 'premium'>;
   onNext: () => void;
 }
 
@@ -45,11 +45,15 @@ const getTopicColor = (topic: string) => {
   }
 };
 
-export const AffirmationCard = ({ affirmation, onNext }: AffirmationCardProps) => {
+export const AffirmationCard = ({ affirmationTopic, onNext }: AffirmationCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [affirmationId, setAffirmationId] = useState<string | null>(null);
+  
+  const { data: fullAffirmation, isLoading: isLoadingAffirmation } = useAffirmationById(affirmationId);
 
   const handleCardClick = () => {
     if (!isFlipped) {
+      setAffirmationId(affirmationTopic.id);
       setIsFlipped(true);
     }
   };
@@ -57,6 +61,7 @@ export const AffirmationCard = ({ affirmation, onNext }: AffirmationCardProps) =
   const handleNextClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsFlipped(false);
+    setAffirmationId(null);
     onNext();
   };
 
@@ -72,7 +77,7 @@ export const AffirmationCard = ({ affirmation, onNext }: AffirmationCardProps) =
         <Card className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-50 to-purple-50 border-0 shadow-lg hover:shadow-xl transition-all duration-300 backface-hidden">
           <CardContent className="flex flex-col items-center justify-center h-full p-8 text-center">
             <div className="flex justify-center items-center gap-2 mb-4 flex-wrap">
-              {affirmation.premium && (
+              {affirmationTopic.premium && (
                 <Badge variant="secondary" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white mb-2">
                   Premium
                 </Badge>
@@ -80,13 +85,13 @@ export const AffirmationCard = ({ affirmation, onNext }: AffirmationCardProps) =
             </div>
             
             <div className="flex items-center justify-center gap-3 mb-4">
-              <div className={`p-3 rounded-full ${getTopicColor(affirmation.topic).replace('text-', 'bg-').replace('border-', '').replace('bg-', 'bg-opacity-20 bg-')}`}>
-                {getTopicIcon(affirmation.topic)}
+              <div className={`p-3 rounded-full ${getTopicColor(affirmationTopic.topic).replace('text-', 'bg-').replace('border-', '').replace('bg-', 'bg-opacity-20 bg-')}`}>
+                {getTopicIcon(affirmationTopic.topic)}
               </div>
             </div>
             
             <h3 className="text-2xl font-semibold text-gray-800 capitalize">
-              {affirmation.topic.replace('-', ' ')}
+              {affirmationTopic.topic.replace('-', ' ')}
             </h3>
             
             <p className="text-gray-600 mt-2">Click to reveal affirmation</p>
@@ -96,32 +101,42 @@ export const AffirmationCard = ({ affirmation, onNext }: AffirmationCardProps) =
         {/* Back of card - Affirmation text */}
         <Card className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-50 to-purple-50 border-0 shadow-lg backface-hidden rotate-y-180">
           <CardContent className="flex flex-col items-center justify-center h-full p-8 text-center">
-            <div className="flex justify-center items-center gap-2 mb-4 flex-wrap">
-              <Badge 
-                variant="outline" 
-                className={`flex items-center gap-1 ${getTopicColor(affirmation.topic)}`}
-              >
-                {getTopicIcon(affirmation.topic)}
-                {affirmation.topic.charAt(0).toUpperCase() + affirmation.topic.slice(1)}
-              </Badge>
-              {affirmation.premium && (
-                <Badge variant="secondary" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-                  Premium
-                </Badge>
-              )}
-            </div>
-            
-            <blockquote className="text-lg font-medium text-gray-800 leading-relaxed italic mb-4 flex-1 flex items-center">
-              "{affirmation.text}"
-            </blockquote>
-            
-            <Button 
-              onClick={handleNextClick}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
-            >
-              <RotateCcw className="w-4 h-4 mr-2" />
-              Next Affirmation
-            </Button>
+            {isLoadingAffirmation ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+              </div>
+            ) : fullAffirmation ? (
+              <>
+                <div className="flex justify-center items-center gap-2 mb-4 flex-wrap">
+                  <Badge 
+                    variant="outline" 
+                    className={`flex items-center gap-1 ${getTopicColor(fullAffirmation.topic)}`}
+                  >
+                    {getTopicIcon(fullAffirmation.topic)}
+                    {fullAffirmation.topic.charAt(0).toUpperCase() + fullAffirmation.topic.slice(1)}
+                  </Badge>
+                  {fullAffirmation.premium && (
+                    <Badge variant="secondary" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                      Premium
+                    </Badge>
+                  )}
+                </div>
+                
+                <blockquote className="text-lg font-medium text-gray-800 leading-relaxed italic mb-4 flex-1 flex items-center">
+                  "{fullAffirmation.text}"
+                </blockquote>
+                
+                <Button 
+                  onClick={handleNextClick}
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Next Affirmation
+                </Button>
+              </>
+            ) : (
+              <div className="text-center text-gray-500">Failed to load affirmation</div>
+            )}
           </CardContent>
         </Card>
       </div>

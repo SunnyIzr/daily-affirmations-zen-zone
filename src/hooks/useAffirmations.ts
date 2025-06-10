@@ -31,3 +31,49 @@ export const useAffirmations = () => {
     },
   });
 };
+
+export const useAffirmationTopics = () => {
+  return useQuery({
+    queryKey: ["affirmation-topics"],
+    queryFn: async (): Promise<Pick<Affirmation, 'id' | 'topic' | 'premium'>[]> => {
+      console.log("Fetching affirmation topics from Supabase...");
+      const { data, error } = await supabase
+        .from("affirmations")
+        .select("id, topic, premium")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching affirmation topics:", error);
+        throw error;
+      }
+
+      console.log("Successfully fetched affirmation topics:", data);
+      return data || [];
+    },
+  });
+};
+
+export const useAffirmationById = (id: string | null) => {
+  return useQuery({
+    queryKey: ["affirmation", id],
+    queryFn: async (): Promise<Affirmation> => {
+      if (!id) throw new Error("No affirmation ID provided");
+      
+      console.log("Fetching affirmation by ID:", id);
+      const { data, error } = await supabase
+        .from("affirmations")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching affirmation:", error);
+        throw error;
+      }
+
+      console.log("Successfully fetched affirmation:", data);
+      return data;
+    },
+    enabled: !!id,
+  });
+};

@@ -1,39 +1,39 @@
 
 import { AffirmationCard } from "@/components/AffirmationCard";
-import { useAffirmations } from "@/hooks/useAffirmations";
+import { useAffirmationTopics } from "@/hooks/useAffirmations";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Sparkles, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const Index = () => {
-  const { data: affirmations, isLoading, error } = useAffirmations();
+  const { data: affirmationTopics, isLoading, error } = useAffirmationTopics();
   const [currentFreeIndex, setCurrentFreeIndex] = useState(0);
   const [currentPremiumIndex, setCurrentPremiumIndex] = useState(0);
 
-  // Get filtered affirmations
-  const freeAffirmations = affirmations?.filter(a => !a.premium) || [];
-  const premiumAffirmations = affirmations?.filter(a => a.premium) || [];
+  // Get filtered affirmation topics
+  const freeTopics = affirmationTopics?.filter(a => !a.premium) || [];
+  const premiumTopics = affirmationTopics?.filter(a => a.premium) || [];
 
   // Initialize random indices when data loads
   useEffect(() => {
-    if (freeAffirmations.length > 0) {
-      setCurrentFreeIndex(Math.floor(Math.random() * freeAffirmations.length));
+    if (freeTopics.length > 0) {
+      setCurrentFreeIndex(Math.floor(Math.random() * freeTopics.length));
     }
-    if (premiumAffirmations.length > 0) {
-      setCurrentPremiumIndex(Math.floor(Math.random() * premiumAffirmations.length));
+    if (premiumTopics.length > 0) {
+      setCurrentPremiumIndex(Math.floor(Math.random() * premiumTopics.length));
     }
-  }, [affirmations]);
+  }, [affirmationTopics]);
 
   const handleNextFree = () => {
-    if (freeAffirmations.length > 0) {
-      setCurrentFreeIndex((prev) => (prev + 1) % freeAffirmations.length);
+    if (freeTopics.length > 0) {
+      setCurrentFreeIndex((prev) => (prev + 1) % freeTopics.length);
     }
   };
 
   const handleNextPremium = () => {
-    if (premiumAffirmations.length > 0) {
-      setCurrentPremiumIndex((prev) => (prev + 1) % premiumAffirmations.length);
+    if (premiumTopics.length > 0) {
+      setCurrentPremiumIndex((prev) => (prev + 1) % premiumTopics.length);
     }
   };
 
@@ -75,9 +75,9 @@ const Index = () => {
             </h2>
             {isLoading ? (
               <Skeleton className="h-48 w-full rounded-lg" />
-            ) : freeAffirmations[currentFreeIndex] ? (
+            ) : freeTopics[currentFreeIndex] ? (
               <AffirmationCard 
-                affirmation={freeAffirmations[currentFreeIndex]} 
+                affirmationTopic={freeTopics[currentFreeIndex]} 
                 onNext={handleNextFree}
               />
             ) : (
@@ -92,9 +92,9 @@ const Index = () => {
             </h2>
             {isLoading ? (
               <Skeleton className="h-48 w-full rounded-lg" />
-            ) : premiumAffirmations[currentPremiumIndex] ? (
+            ) : premiumTopics[currentPremiumIndex] ? (
               <AffirmationCard 
-                affirmation={premiumAffirmations[currentPremiumIndex]} 
+                affirmationTopic={premiumTopics[currentPremiumIndex]} 
                 onNext={handleNextPremium}
               />
             ) : (

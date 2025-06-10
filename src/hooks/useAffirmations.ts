@@ -6,6 +6,7 @@ export type Affirmation = {
   id: string;
   text: string;
   premium: boolean;
+  topic: string;
   created_at: string;
   updated_at: string;
 };

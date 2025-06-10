@@ -50,7 +50,7 @@ const Index = () => {
         </div>
 
         {/* Daily Affirmations Side by Side */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto mb-16">
+        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* Free Affirmation */}
           <div>
             <h2 className="text-2xl font-semibold text-center mb-6 text-gray-700">
@@ -78,26 +78,6 @@ const Index = () => {
               <div className="text-center text-gray-500">No premium affirmation available</div>
             )}
           </div>
-        </div>
-
-        {/* All Affirmations */}
-        <div>
-          <h2 className="text-2xl font-semibold text-center mb-8 text-gray-700">
-            All Affirmations
-          </h2>
-          {isLoading ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-1 max-w-4xl mx-auto">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className="h-32 w-full rounded-lg" />
-              ))}
-            </div>
-          ) : (
-            <div className="grid gap-6 max-w-4xl mx-auto">
-              {affirmations?.map((affirmation) => (
-                <AffirmationCard key={affirmation.id} affirmation={affirmation} />
-              ))}
-            </div>
-          )}
         </div>
       </div>
     </div>

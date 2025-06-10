@@ -4,9 +4,38 @@ import { useAffirmations } from "@/hooks/useAffirmations";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Sparkles, Heart } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const Index = () => {
   const { data: affirmations, isLoading, error } = useAffirmations();
+  const [currentFreeIndex, setCurrentFreeIndex] = useState(0);
+  const [currentPremiumIndex, setCurrentPremiumIndex] = useState(0);
+
+  // Get filtered affirmations
+  const freeAffirmations = affirmations?.filter(a => !a.premium) || [];
+  const premiumAffirmations = affirmations?.filter(a => a.premium) || [];
+
+  // Initialize random indices when data loads
+  useEffect(() => {
+    if (freeAffirmations.length > 0) {
+      setCurrentFreeIndex(Math.floor(Math.random() * freeAffirmations.length));
+    }
+    if (premiumAffirmations.length > 0) {
+      setCurrentPremiumIndex(Math.floor(Math.random() * premiumAffirmations.length));
+    }
+  }, [affirmations]);
+
+  const handleNextFree = () => {
+    if (freeAffirmations.length > 0) {
+      setCurrentFreeIndex((prev) => (prev + 1) % freeAffirmations.length);
+    }
+  };
+
+  const handleNextPremium = () => {
+    if (premiumAffirmations.length > 0) {
+      setCurrentPremiumIndex((prev) => (prev + 1) % premiumAffirmations.length);
+    }
+  };
 
   if (error) {
     return (
@@ -19,18 +48,6 @@ const Index = () => {
       </div>
     );
   }
-
-  // Get random free and premium affirmations
-  const freeAffirmations = affirmations?.filter(a => !a.premium) || [];
-  const premiumAffirmations = affirmations?.filter(a => a.premium) || [];
-  
-  const randomFreeAffirmation = freeAffirmations.length > 0 
-    ? freeAffirmations[Math.floor(Math.random() * freeAffirmations.length)]
-    : null;
-    
-  const randomPremiumAffirmation = premiumAffirmations.length > 0 
-    ? premiumAffirmations[Math.floor(Math.random() * premiumAffirmations.length)]
-    : null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100">
@@ -58,8 +75,11 @@ const Index = () => {
             </h2>
             {isLoading ? (
               <Skeleton className="h-48 w-full rounded-lg" />
-            ) : randomFreeAffirmation ? (
-              <AffirmationCard affirmation={randomFreeAffirmation} />
+            ) : freeAffirmations[currentFreeIndex] ? (
+              <AffirmationCard 
+                affirmation={freeAffirmations[currentFreeIndex]} 
+                onNext={handleNextFree}
+              />
             ) : (
               <div className="text-center text-gray-500">No free affirmation available</div>
             )}
@@ -72,8 +92,11 @@ const Index = () => {
             </h2>
             {isLoading ? (
               <Skeleton className="h-48 w-full rounded-lg" />
-            ) : randomPremiumAffirmation ? (
-              <AffirmationCard affirmation={randomPremiumAffirmation} />
+            ) : premiumAffirmations[currentPremiumIndex] ? (
+              <AffirmationCard 
+                affirmation={premiumAffirmations[currentPremiumIndex]} 
+                onNext={handleNextPremium}
+              />
             ) : (
               <div className="text-center text-gray-500">No premium affirmation available</div>
             )}
